@@ -1,19 +1,17 @@
 #!/usr/bin/env python
 import sys
-import math
 import netsnmp
+import math
 from prettytable import PrettyTable
 from optparse import OptionParser
 
-# Memory statistics        
-total_swap_size       = '.1.3.6.1.4.1.2021.4.3.0'
-available_swap_space  = '.1.3.6.1.4.1.2021.4.4.0'
-total_ram_in_machine  = '.1.3.6.1.4.1.2021.4.5.0'
-total_ram_used        = '.1.3.6.1.4.1.2021.4.6.0'
-total_ram_free        = '.1.3.6.1.4.1.2021.4.11.0'
-total_ram_shared      = '.1.3.6.1.4.1.2021.4.13.0'
-total_ram_buffered    = '.1.3.6.1.4.1.2021.4.14.0'
-total_cached_memory   = '.1.3.6.1.4.1.2021.4.15.0'
+disk_mount_path  = ".1.3.6.1.4.1.2021.9.1.2"
+disk_part_path   = ".1.3.6.1.4.1.2021.9.1.3"
+total_size       = ".1.3.6.1.4.1.2021.9.1.6"
+avail_size       = ".1.3.6.1.4.1.2021.9.1.7"
+used_size        = ".1.3.6.1.4.1.2021.9.1.8"
+used_size_perc   = ".1.3.6.1.4.1.2021.9.1.9"
+used_inodes_perc = ".1.3.6.1.4.1.2021.9.1.10"
 
 def convertSize(size):
     size_name = ("KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
@@ -34,7 +32,7 @@ def IsPortValid(option, opt_str, value, parser):
         parser.values.snmp_port = value
 
 help = """%prog [-d <destination>] [-p <port>] [-c <community>] [-s <snmp-version>]
-Description: Returns the memory statistics of a linux host.
+Description: Returns the disk statistics of a linux host.
 Copyright 2015, Konstantinos Patronas, Email: kpatronas@gmail.com"""
 
 def main():
@@ -77,27 +75,43 @@ def main():
                                   Version    = snmp_version,
                                   Community  = snmp_community,
                                   RemotePort = snmp_port)
-        
-        # SNMP Get the Memory vars
-        memory_vars = netsnmp.VarList(netsnmp.Varbind(total_swap_size),
-                                      netsnmp.Varbind(available_swap_space),
-                                      netsnmp.Varbind(total_ram_in_machine),
-                                      netsnmp.Varbind(total_ram_used),
-                                      netsnmp.Varbind(total_ram_free),
-                                      netsnmp.Varbind(total_ram_shared),
-                                      netsnmp.Varbind(total_ram_buffered),
-                                      netsnmp.Varbind(total_cached_memory))
-        memory_res = session.get(memory_vars)
+
+        disk_mount_path  = ".1.3.6.1.4.1.2021.9.1.2"
+        disk_part_path   = ".1.3.6.1.4.1.2021.9.1.3"
+        total_size       = ".1.3.6.1.4.1.2021.9.1.6"
+        avail_size       = ".1.3.6.1.4.1.2021.9.1.7"
+        used_size        = ".1.3.6.1.4.1.2021.9.1.8"
+        used_size_perc   = ".1.3.6.1.4.1.2021.9.1.9"
+        used_inodes_perc = ".1.3.6.1.4.1.2021.9.1.10"
+
+        # SNMP Get the CPU load OIDs
+        disk_mount_path_vars = netsnmp.VarList(netsnmp.Varbind(disk_mount_path))
+        disk_part_path_vars  = netsnmp.VarList(netsnmp.Varbind(disk_part_path))
+        total_size_vars      = netsnmp.VarList(netsnmp.Varbind(total_size))
+        avail_size_vars      = netsnmp.VarList(netsnmp.Varbind(avail_size))
+        used_size_vars       = netsnmp.VarList(netsnmp.Varbind(used_size))
+        used_size_perc_vars  = netsnmp.VarList(netsnmp.Varbind(used_size_perc))
+        used_size_perc_vars  = netsnmp.VarList(netsnmp.Varbind(used_inodes_perc))
+
+        disk_mount_path_res   = session.walk(disk_mount_path_vars)
+        disk_part_path_res    = session.walk(disk_part_path_vars)
+        total_size_res        = session.walk(total_size_vars)
+        avail_size_res        = session.walk(avail_size_vars)
+        used_size_res         = session.walk(used_size_vars)
+        used_size_perc_res    = session.walk(used_size_perc_vars)
+        used_size_perc_res    = session.walk(used_size_perc_vars)
+
         if (session.ErrorStr):
             print ('Error occurred during SNMPget: '+session.ErrorStr)
             sys.exit(2)
-        x = PrettyTable(["RAM Free", "RAM Used", "Swap Free", "Swap Used"])
+        i = 0
+        x = PrettyTable(["Mount Point", "Partition", "Total Size", "Used Size"])
         x.border = False
         x.align["Mount Point"] = "l"
-        x.add_row([convertSize(int(memory_res[2])),
-                   convertSize((int(memory_res[4])+int(memory_res[6])+int(memory_res[7]))-int(memory_res[0])),
-                   convertSize(int(memory_res[0])),
-                   convertSize(int(memory_res[1]))])
+        for path in disk_mount_path_res:
+            if "/" in str(disk_part_path_res[i]):
+                x.add_row([path,str(disk_part_path_res[i]), convertSize((int(total_size_res[i]))),convertSize((int(used_size_res[i])))])
+            i=i+1
         print(x)
     except Exception as exception_error:
         print ('Error occurred during SNMPget: '+str(exception_error))
