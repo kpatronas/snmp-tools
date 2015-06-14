@@ -50,7 +50,7 @@ def main():
         choices = ("1","2"),
         dest    = "snmp_version",
         default = "1",
-        help    = "SNMP version, defaults to '1', possible values [1,2,2c]")
+        help    = "SNMP version, defaults to '1', possible values [1,2]")
     (options, args) = parser.parse_args()
     try:
         snmp_hostname   = options.snmp_destination  # string

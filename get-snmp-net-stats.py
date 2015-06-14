@@ -73,7 +73,7 @@ def main():
         choices = ("1","2"),
         dest    = "snmp_version",
         default = "1",
-        help    = "SNMP version, defaults to '1', possible values [1,2,2c]")
+        help    = "SNMP version, defaults to '1', possible values [1,2]")
     (options, args) = parser.parse_args()
     try:
         snmp_hostname   = options.snmp_destination  # string
@@ -112,7 +112,7 @@ def main():
         ifOperStatus_res        = session.walk(ifOperStatus_vars)
 
         if (session.ErrorStr):
-            print ('Error occurred during SNMP quering: '+session.ErrorStr)
+            print ('Error occurred during SNMP query: '+session.ErrorStr)
             sys.exit(2)
         i = 0
         x = PrettyTable(["Interface Description","Total-In","Total-Out","Admin Status","Operational Status"])
