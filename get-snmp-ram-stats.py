@@ -89,7 +89,7 @@ def main():
                                       netsnmp.Varbind(total_cached_memory))
         memory_res = session.get(memory_vars)
         if (session.ErrorStr):
-            print ('Error occurred during SNMPget: '+session.ErrorStr)
+            print ('Error occurred during SNMP query: '+session.ErrorStr)
             sys.exit(2)
         x = PrettyTable(["RAM Total", "RAM Free", "Swap Total", "Swap Free"])
         x.border = False
@@ -100,7 +100,7 @@ def main():
                    convertSize(int(memory_res[1]))])
         print(x)
     except Exception as exception_error:
-        print ('Error occurred: '+str(exception_error))
+        print ('Error occurred during executing script: '+str(exception_error))
         sys.exit(2)
         
 if __name__ == "__main__":

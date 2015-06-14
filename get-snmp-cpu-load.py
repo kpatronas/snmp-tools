@@ -62,7 +62,7 @@ def main():
                                         netsnmp.Varbind('.1.3.6.1.4.1.2021.10.1.3.3')) # 15 Min CPU Load
         cpu_load_res = session.get(cpu_load_vars)
         if (session.ErrorStr):
-            print ('Error occurred during SNMPget: '+session.ErrorStr)
+            print ('Error occurred during SNMP query: '+session.ErrorStr)
             sys.exit(2)
         x = PrettyTable(["1 Min", "5 Min", "15 Min"])
         x.border = False
@@ -70,7 +70,7 @@ def main():
         x.add_row([str(cpu_load_res[0]),str(cpu_load_res[1]),str(cpu_load_res[2])])
         print(x)
     except Exception as exception_error:
-        print ('Error occurred during SNMPget: '+exception_error)
+        print ('Error occurred during executing script: '+exception_error)
         sys.exit(2)
         
 if __name__ == "__main__":

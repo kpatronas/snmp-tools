@@ -102,7 +102,7 @@ def main():
         used_size_perc_res    = session.walk(used_size_perc_vars)
 
         if (session.ErrorStr):
-            print ('Error occurred during SNMPget: '+session.ErrorStr)
+            print ('Error occurred during SNMP query: '+session.ErrorStr)
             sys.exit(2)
         i = 0
         x = PrettyTable(["Mount Point", "Partition", "Total Size", "Used Size"])
@@ -114,7 +114,7 @@ def main():
             i=i+1
         print(x)
     except Exception as exception_error:
-        print ('Error occurred during SNMPget: '+str(exception_error))
+        print ('Error occurred during executing script: '+str(exception_error))
         sys.exit(2)
         
 if __name__ == "__main__":

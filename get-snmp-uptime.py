@@ -68,11 +68,11 @@ def main():
         uptime_res   = session.get(uptime_vars)
 
         if (session.ErrorStr):
-            print ('Error occurred during SNMPget: '+session.ErrorStr)
+            print ('Error occurred during SNMP query: '+session.ErrorStr)
             sys.exit(2)
         print("Uptime: "+str(datetime.timedelta(seconds=int(uptime_res[0])/100)))
     except Exception as exception_error:
-        print ('Error occurred: '+str(exception_error))
+        print ('Error occurred during executing script: '+str(exception_error))
         sys.exit(2)
         
 if __name__ == "__main__":
